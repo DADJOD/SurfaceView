@@ -1,13 +1,16 @@
 package com.example.surfaceview
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceHolder.Callback2
 import android.view.SurfaceView
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -15,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     private var height: Int = 0
     private var width: Int = 0
     private lateinit var paperBitmap: Bitmap
-    private lateinit var surface: Surface
+    private var surface: Surface? = null
     private lateinit var holder: SurfaceHolder
     private lateinit var surfaceView: SurfaceView
 
@@ -32,11 +35,15 @@ class MainActivity : AppCompatActivity() {
         override fun surfaceRedrawNeeded(holder: SurfaceHolder) {}
         override fun surfaceCreated(holder: SurfaceHolder) {}
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            stopPaint()
             startPaint(width, height)
         }
-        override fun surfaceDestroyed(holder: SurfaceHolder) {}
+        override fun surfaceDestroyed(holder: SurfaceHolder) {
+            stopPaint()
+        }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     fun startPaint(width: Int, height: Int) {
         this.width = width
         this.height = height
@@ -46,6 +53,15 @@ class MainActivity : AppCompatActivity() {
         paperCanvas = Canvas(paperBitmap)
 
         drawDot((width/2).toFloat(), (height/2).toFloat())
+        surfaceView.setOnTouchListener(View.OnTouchListener { _, event ->
+            drawDot(event.x, event.y)
+            Log.d("happySDK", "$event")
+            return@OnTouchListener true
+        })
+    }
+
+    fun stopPaint() {
+        surface = null
     }
 
     private val paintColor = 0xffff0000
@@ -65,9 +81,9 @@ class MainActivity : AppCompatActivity() {
         drawPaperBitmap()
     }
 
-    fun drawPaperBitmap() {
-        val canvas = surface.lockCanvas(null)
+    private fun drawPaperBitmap() {
+        val canvas = surface!!.lockCanvas(null)
         canvas.drawBitmap(paperBitmap, 0F, 0F, null)
-        surface.unlockCanvasAndPost(canvas)
+        surface!!.unlockCanvasAndPost(canvas)
     }
 }

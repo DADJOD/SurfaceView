@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceHolder.Callback2
@@ -14,6 +15,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+    private var lastX: Float = 0F
+    private var lastY: Float = 0F
     private lateinit var paperCanvas: Canvas
     private var height: Int = 0
     private var width: Int = 0
@@ -54,7 +57,13 @@ class MainActivity : AppCompatActivity() {
 
         drawDot((width/2).toFloat(), (height/2).toFloat())
         surfaceView.setOnTouchListener(View.OnTouchListener { _, event ->
-            drawDot(event.x, event.y)
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                drawDot(event.x, event.y)
+            } else if (event.action == MotionEvent.ACTION_UP
+                || event.action == MotionEvent.ACTION_MOVE) {
+                drawLine(event.x, event.y)
+            }
+
             Log.d("happySDK", "$event")
             return@OnTouchListener true
         })
@@ -77,7 +86,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun drawDot(x: Float, y: Float) {
         init()
+        lastX = x
+        lastY = y
         paperCanvas.drawPoint(x, y, drawPaint)
+        drawPaperBitmap()
+    }
+
+    private fun drawLine(x: Float, y: Float) {
+        init()
+        paperCanvas.drawLine(lastX, lastY, x, y, drawPaint)
+        lastX = x
+        lastY = y
         drawPaperBitmap()
     }
 

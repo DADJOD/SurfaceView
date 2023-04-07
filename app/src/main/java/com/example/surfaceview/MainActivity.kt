@@ -55,7 +55,8 @@ class MainActivity : AppCompatActivity() {
         paperBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         paperCanvas = Canvas(paperBitmap)
 
-        drawDot((width/2).toFloat(), (height/2).toFloat())
+//        drawDot((width/2).toFloat(), (height/2).toFloat()) // draw dot
+
         surfaceView.setOnTouchListener(View.OnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 drawDot(event.x, event.y)
